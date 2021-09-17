@@ -10,7 +10,7 @@
 % projected independently, cleaned, and saved to disk as a 2D TIFF image
 % (both cleaned and original versions are saved).
 %
-% Note that the script calls clean_angio_strips_and_emph_vessels.m
+% Note that the script calls clean_angio_stripes_and_emph_vessels.m
 % This is where the parameters for 'destriping' and vessel emphasis using
 % the Frangi filter are defined (and should be adjusted manually).
 %
