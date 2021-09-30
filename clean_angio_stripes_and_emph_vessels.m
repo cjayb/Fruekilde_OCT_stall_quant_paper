@@ -1,4 +1,4 @@
-function clean_img = clean_angio_stripes_and_emph_vessels(img, vessel_mask)
+function varargout = clean_angio_stripes_and_emph_vessels(img, vessel_mask)
 
 if nargin < 2
     vessel_mask = [];
@@ -31,6 +31,17 @@ end
 frangi = FrangiFilter2D(med_destripe, cfg_opts);
 
 clean_img = histeq(frangi / max(frangi(:)));
+
+varargout{1} = clean_img;
+
+% for plotting
+if nargout > 1
+    varargout{1} = destripe;
+    varargout{2} = frangi;
+    varargout{3} = clean_img;
+else
+    varargout{1} = clean_img;
+end
 
 %% LICENSE INFORMATION of FrangiFilter2D
 % Copyright (c) 2009, Dirk-Jan Kroon

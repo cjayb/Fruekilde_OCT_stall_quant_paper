@@ -34,14 +34,12 @@ min_edge_len = 16;  % disregard edges shorter than this (after edgelink)
 do_correct_motion = true;
 xfm_type = 'translation';
 
-% scratch_folder = tempdir;
-scratch_folder = '/Volumes/LPSDATA2/scratch/OCT_wildtypes_20pixels_cjb';
 caps_viz_matfile = 'capmap.mat';
 prev_ROI_dir = [];
 
 fprintf(1, 'Select TIFF folder\n')
 if isempty(prev_ROI_dir)
-    mip_folder = uigetdir(scratch_folder);
+    mip_folder = uigetdir();
 else
     mip_folder = uigetdir(fullfile(prev_ROI_dir, '../'));
 end

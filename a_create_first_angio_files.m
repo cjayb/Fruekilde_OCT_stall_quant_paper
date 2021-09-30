@@ -13,19 +13,23 @@
 
 clear all
 
+fprintf(1, 'Select single data frame as input ... ')
+[filename, nii_folder] = uigetfile('*.nii', 'Select input file');
+fprintf(1, '%s\n', fullfile(nii_folder, filename))
+
 % all output will be written here
-scratch_folder = '/tmp/OCT';
+fprintf(1, 'Choose output data folder ... ')
+output_folder = uigetdir(nii_folder, 'Select output folder');
+fprintf(1, '%s\n', output_folder)
 
-OCT_base_folder = '/Users/au210321/data/Signe/OCT/nii';
-[filename, pathname] = uigetfile(fullfile(OCT_base_folder, '*.nii'));
-
-export_QC_images = false;
+export_QC_images = true;
 dpi = 300;
-image_out_folder = fullfile(scratch_folder, 'Figures');
+image_out_folder = fullfile(output_folder, 'Figures');
+mkdir(image_out_folder);
 
 avg_frames_y = [190, 210];  % visualise around the mid-y in a 400x400 stack
 
-nii = NiiReader(fullfile(pathname, filename));
+nii = NiiReader(fullfile(nii_folder, filename));
 avg_ref = nii.readFrame(avg_frames_y(1));  % z-by-x
 plot_nx = floor(size(avg_ref, 2) / 2);
 
@@ -37,14 +41,15 @@ avg_ref = avg_ref / (diff(avg_frames_y) + 1);
 figure(501); clf
 Bscan = abs(avg_ref(:, 1:plot_nx)) + abs(avg_ref(:, plot_nx+1:end));
 Bscan = log(Bscan / max(Bscan(:)));
-imagesc(Ascan); axis equal; axis tight
+imagesc(Bscan); axis equal; axis tight
 colormap parula
-% set(gca, 'CLim', [0 0.5])
 set(gcf, 'Position', [40   180   480   890])
-set(gca, 'FontSize', 12)
-tit = sprintf('Log mean magnitude image (y=[%d, %d])', avg_frames_y);
+set(gca, 'FontSize', 14)
+tit = {'Normalised log magnitude', ...
+       sprintf('(mean over y = [%d, %d])', avg_frames_y)};
+
 ylabel('Z (pixels)'); xlabel('X (pixels)')
-title(tit)
+title(tit, 'FontSize', 18, 'FontName', 'Arial', 'FontAngle', 'italic')
 if export_QC_images
     fname = 'Fig1A_MeanA-scan-logarithmic.tif';
     exportgraphics(gcf, fullfile(image_out_folder, fname), 'Resolution', dpi)    
@@ -72,7 +77,6 @@ angio_zsize = diff(nii.zrange);
 % where to start looking?
 global pl_zrange  % for slider to return the chosen range
 
-% WRONG! pl_zstart = nii.zrange(1) + floor(diff(nii.zrange) / 2) - floor(zstack / 2);
 % pl_zstart is relative to angio, where index 1 = nii.zrange(1) in raw nii
 pl_zstart = floor(angio_zsize / 2) - floor(zstack / 2);
 
@@ -115,17 +119,14 @@ if export_QC_images
 end
 %% write out the 3D angio stack for the single frame, ready for next stage
 
-[Gnz,Gnx,Gny] = size(angio);
-Izc = mean(mean(angio(:,round(Gnx/2)-5:round(Gnx/2)+4,round(Gny/2)-5:round(Gny/2)+4),2),3);
-save(fullfile(scratch_folder,  [filename(1:end-4),'_Izc.mat']),'Izc')
-
 fprintf(1, 'Saving angio...')
 
 % just take the selected zrange
 angio = angio(pl_zrange, :, :);
 
-save(fullfile(scratch_folder,  [filename(1:end-4),'_angio.mat']),...
-    'angio','pl_zrange','nii_zrange', 'zstack', '-v7.3');
+mkdir(fullfile(output_folder, '3D_angio'));
+save(fullfile(output_folder, '3D_angio', [filename(1:end-4),'_3D.mat']),...
+    'angio','pl_zrange','nii_zrange', 'zstack', 'nii_folder', '-v7.3');
 
 fprintf(1, 'done\n')
 

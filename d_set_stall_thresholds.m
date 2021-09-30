@@ -25,9 +25,8 @@
 
 clear all
 
-init_stall_threshold = 0.5;  % initial cutoff, adjusted manually for each capillary
+init_stall_threshold = 0.67;  % initial cutoff, adjusted manually for each capillary
 
-scratch_folder = '/Volumes/LPSDATA2/scratch/OCT_wildtypes_20pixels_cjb';
 thresh_matfile = 'unique_stall_thresholds.mat';
 stalls_matfile = 'stalls.mat';
 caps_viz_matfile = 'capmap.mat';
@@ -40,7 +39,7 @@ global unique_thresholds show_cap_overlay bad_frames
 
 fprintf(1, 'Select TIFF folder\n')
 if isempty(prev_ROI_dir)
-    mip_folder = uigetdir(scratch_folder);
+    mip_folder = uigetdir();
 else
     mip_folder = uigetdir(fullfile(prev_ROI_dir, '../'));
 end
