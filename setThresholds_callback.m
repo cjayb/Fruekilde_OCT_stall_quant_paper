@@ -55,6 +55,13 @@ elseif strcmp(ck, 'g')
         el = filt_edgelist{cap_id};
         plot(el(:,2), el(:,1), '.', 'Color', [1 0 0])
     end
+    figure(fig_obj)    
+elseif strcmp(ck, 'f')
+    gotocol = str2num(input('Go to frame # ', 's'));
+    if gotocol > 0 && gotocol <= n_frames
+        frame_id = gotocol;
+    end
+    figure(fig_obj)    
 elseif strcmp(ck, '1')
     show_cap_overlay = ~show_cap_overlay;
 elseif strcmp(ck, 'space')    
@@ -90,7 +97,7 @@ elseif strcmp(ck, 'leftarrow')
         frame_id = frame_id - 1;
     end
 end
-if strcmp(ck, 'rightarrow') || strcmp(ck, 'leftarrow')
+if strcmp(ck, 'rightarrow') || strcmp(ck, 'leftarrow') || strcmp(ck, 'f')
     subplot(2,2,1); hold off
     cur_frame = eq_vessels(:, :, frame_id);
     imagesc(cur_frame); hold on
@@ -115,9 +122,6 @@ if strcmp(ck, 'rightarrow') || strcmp(ck, 'leftarrow')
     subplot(1,2,2); delete(findobj(gca, 'type', 'line'))
     hold on; plot([1 n_frames], [cap_id cap_id], 'g--', 'LineWidth', 0.5); hold off
     hold on; plot([frame_id frame_id], [1 n_caps], 'g--', 'LineWidth', 0.5); hold off
-
-
-%         plot(el(:,2), el(:,1), '.', 'Color', [1 0 0 0.2])
 
 end
 

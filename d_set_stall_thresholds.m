@@ -1,14 +1,34 @@
-%% d)
+%% d) Fruekilde et al. (in preparation)
+% The 'stallograms' generated in the previous step reflect image intensity
+% profiles of the edges that approximate biological capillary segments. The
+% purpose of the present script is to identify those intensity fluctuations
+% that correspond to 'true' stall events, where capillary flow is blocked.
+% In an ideal situation, without movement or other artefacts, a simple
+% threshold could be pre-specified. With real data, however, the threshold
+% of each segment must be determined individually: only a fraction of an
+% edge may actually be blocked (see manuscript for discussion), movement
+% may render portions of the image plane blank and be confused with an
+% actual stall, etc. Depending on the noise level and number of stalls,
+% experienced users can perform thresholding on a 60-frame acquisition in
+% 5-15 min (ca. 150 edges/capillaries).
+%
+% The GUI in the present scripts accepts the following interactions:
+% - up/down arrow: select previous/next edge
+% - left/right arrow: select previous/next frame
+% - 2,w,s,x: adjust the stall-threshold of the current edge in steps of
+%            +0.1, +0.01, -0.01, -0.1, respectively
+% - 1: toggle showing the current edge overlay (red)
+% - g: jump to edge number (type in command window)
+% - f: jump to frame number (type in command window)
+% - space: mark current frame bad
+%
+% NB! Remember to save the results (last cell)
 
-clear all
+init_stall_threshold = 0.67;  % initial cutoff, adjusted manually for each capillary
 
-init_stall_threshold = 0.5;  % initial cutoff, adjusted manually for each capillary
-
-scratch_folder = '/Users/au210321/data/Signe/OCT/EPM';
 thresh_matfile = 'unique_stall_thresholds.mat';
 stalls_matfile = 'stalls.mat';
 caps_viz_matfile = 'capmap.mat';
-prev_ROI_dir = [];
 %%%
 
 clear global
@@ -16,8 +36,10 @@ global cap_id filt_edgelist bin_stalls stallogram eq_vessels frame_id
 global unique_thresholds show_cap_overlay bad_frames
 
 fprintf(1, 'Select TIFF folder\n')
+prev_ROI_dir = [];
 if isempty(prev_ROI_dir)
-    mip_folder = uigetdir(scratch_folder);
+    mip_folder = uigetdir();
+    prev_ROI_dir = mip_folder;
 else
     mip_folder = uigetdir(fullfile(prev_ROI_dir, '../'));
 end

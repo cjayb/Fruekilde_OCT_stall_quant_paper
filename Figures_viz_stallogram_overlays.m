@@ -1,35 +1,36 @@
 % Choose single roi folder (TIFF, cleaned), reads stalls from step d)
-image_out_folder = '/Users/au210321/data';
-dpi = 300;
 
-scratch_folder = '/Users/au210321/data/Signe/OCT/EPM';
+scratch_base = '/Users/au210321/tmp';
+image_out_folder = fullfile(scratch_base, 'wt07_roi1_figure4');
+mkdir(image_out_folder)
 
 thresh_matfile = 'unique_stall_thresholds.mat';
 stalls_matfile = 'stalls.mat';
 caps_matfile = 'capmap.mat';
 min_stall_len = 2;
-prev_ROI_dir = [];
 
 fprintf(1, 'Select TIFF folder\n')
-if isempty(prev_ROI_dir)
-    mip_folder = uigetdir(scratch_folder);
-else
-    mip_folder = uigetdir(fullfile(prev_ROI_dir, '../'));
-end
+mip_folder = uigetdir(scratch_base);
 
 fname_stalls = fullfile(mip_folder, stalls_matfile);
 fname_caps = fullfile(mip_folder, caps_matfile);
+
+dpi = 300;
 %%
 clear global
 global filt_edgelist sgram plot_mip
 
 
 % save binary stallograms, as well as all the variables needed to reproduce
-load(fname_stalls, 'bin_stalls', 'filt_edgelist', 'bad_frames');
+load(fname_stalls, 'bin_stalls', 'filt_edgelist');
 load(fname_caps, 'eq_vessels');
              
-sgram = filter_stallogram(bin_stalls, min_stall_len, bad_frames);
-
+sgram = filter_stallogram(bin_stalls, min_stall_len);
+rowsum = sum(single(sgram), 2);
+rowsum = rowsum(rowsum > 0);
+fprintf(1, 'Mean stall rate: %.02f\n', 100 * mean(rowsum) / size(sgram, 2))
+fprintf(1, 'Min stall rate: %.02f\n', 100 * min(rowsum) / size(sgram, 2))
+fprintf(1, 'Max stall rate: %.02f\n', 100 * max(rowsum) / size(sgram, 2))
 %
 iact_fig = figure(303); clf;
 % set(iact_fig, 'Position', [100, 100, 800, 800])
@@ -45,16 +46,14 @@ viz_all_caps(plot_mip, sgram, filt_edgelist)
 set(iact_fig, 'KeyPressFcn', @setOverlays_callback);
 
 %% only run if want to export
-image_out_folder = '/Users/au210321/Dropbox/Work for Chris/OCT/Figures';
-dpi = 300;
+
 fname = 'Fig4A_CapillariesStalling.tif';
 % fname = 'Fig4B_StallRatePercent.tif';
 % fname = 'Fig4C_LongestStall.tif';
 exportgraphics(gcf, fullfile(image_out_folder, fname), 'Resolution', dpi)
 %% NEW vs OLD comparison?
 figure(601); clf
-set(gcf, 'Position', [100   140   700   760])
-subplot(1,2,1);
+set(gcf, 'Position', [100   140   400  700 ])
 new_sgram = bin_stalls + sgram;
 cmap = [1 1 1; 0 0 1; 1 0 0];
 imagesc(new_sgram); colormap(cmap)
@@ -63,36 +62,8 @@ title('Binary stallogram')
 xlabel('Time (frame no.)')
 ylabel('Capillary (index no.)')
 
-fname_filter = fullfile(mip_folder, '../../results/*.mat');
-manual_res = dir(fname_filter);
-load(fullfile(manual_res(end).folder, manual_res(end).name), 'StallingMatrix')
-filt_StallingMatrix = filter_stallogram(StallingMatrix, min_stall_len);
-comb_StallingMatrix = StallingMatrix + filt_StallingMatrix;
 
-subplot(6,2,[2 4 6]);
-imagesc(comb_StallingMatrix); colormap(cmap)
-axis equal; axis tight
-title('Manual binary stallogram')
-xlabel('Time (frame no.)')
-ylabel('Capillary (index no.)')
-
-fname_filter = fullfile(mip_folder, '../../results/*_cropped.png');
-cropped_fname = dir(fname_filter);
-bar = split(cropped_fname(1).name, '_');
-n_caps = str2num(bar{3});
-img = imread(fullfile(cropped_fname(1).folder, cropped_fname(1).name));
-subplot(6, 2, [8 10 12])
-image(img)
-axis equal; axis tight
-title(sprintf('Manual capillary count (%d)', n_caps))
-set(gca, 'XTick', []); set(gca, 'YTick', []);
-
-axes = get(gcf, 'Children');
-for an = 1:length(axes)
-    set(axes(an), 'FontSize', 12)
-end
-%%
-fname = 'Fig6_Comparison_NewOld_Stallograms.tif';
+fname = 'Fig4A_binary_stall_matrix.tif';
 exportgraphics(gcf, fullfile(image_out_folder, fname), 'Resolution', dpi)
 
 
