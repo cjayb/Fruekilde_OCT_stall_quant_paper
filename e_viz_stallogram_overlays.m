@@ -1,21 +1,24 @@
-% Choose single roi folder (TIFF, cleaned), reads stalls from step d)
-image_out_folder = '/Users/au210321/data';
-dpi = 300;
+%% e) Fruekilde et al. (in preparation)
+% Once a stallogram has been created (c) and binarised (d), we are able to
+% visualise and quantify the results. This scripts demonstrates ways to do
+% this, though other statistics may be relevant in particular applications.
 
-scratch_folder = '/Users/au210321/data/Signe/OCT';
+% Choose single roi folder (TIFF, cleaned), reads stalls from step d),
+% e.g., WT07/ROI1/2D_MIP_clean
+
+fprintf(1, 'Select TIFF folder\n')
+prev_ROI_dir = [];
+if isempty(prev_ROI_dir)
+    mip_folder = uigetdir();
+    prev_ROI_dir = mip_folder;
+else
+    mip_folder = uigetdir(fullfile(prev_ROI_dir, '../'));
+end
 
 thresh_matfile = 'unique_stall_thresholds.mat';
 stalls_matfile = 'stalls.mat';
 caps_matfile = 'capmap.mat';
 min_stall_len = 2;
-prev_ROI_dir = [];
-
-fprintf(1, 'Select TIFF folder\n')
-if isempty(prev_ROI_dir)
-    mip_folder = uigetdir(scratch_folder);
-else
-    mip_folder = uigetdir(fullfile(prev_ROI_dir, '../'));
-end
 
 fname_stalls = fullfile(mip_folder, stalls_matfile);
 fname_caps = fullfile(mip_folder, caps_matfile);

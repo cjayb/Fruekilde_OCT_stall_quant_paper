@@ -20,17 +20,15 @@
 % - 1: toggle showing the current edge overlay (red)
 % - g: jump to edge number (type in command window)
 % - f: jump to frame number (type in command window)
+% - space: mark current frame bad
 %
 % NB! Remember to save the results (last cell)
-
-clear all
 
 init_stall_threshold = 0.67;  % initial cutoff, adjusted manually for each capillary
 
 thresh_matfile = 'unique_stall_thresholds.mat';
 stalls_matfile = 'stalls.mat';
 caps_viz_matfile = 'capmap.mat';
-prev_ROI_dir = [];
 %%%
 
 clear global
@@ -38,8 +36,10 @@ global cap_id filt_edgelist bin_stalls stallogram eq_vessels frame_id
 global unique_thresholds show_cap_overlay bad_frames
 
 fprintf(1, 'Select TIFF folder\n')
+prev_ROI_dir = [];
 if isempty(prev_ROI_dir)
     mip_folder = uigetdir();
+    prev_ROI_dir = mip_folder;
 else
     mip_folder = uigetdir(fullfile(prev_ROI_dir, '../'));
 end
