@@ -4,7 +4,7 @@ By: Signe K. Fruekilde, Eugenio G. Jiménez, Kim R. Drasbek,
 Christopher J. Bailey
 
 This repository accompanies
-([our bioRxiv preprint BIORXIV/2021/461840](https://osf.io/me6hf/))
+([our bioRxiv preprint](https://doi.org/10.1101/2021.10.01.461840))
 documenting the need and implementation of a method to obtain measures of
 capillary blood flow stall events in pre-clinical optical coherence
 tomography (OCT) scans.
